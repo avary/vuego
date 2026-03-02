@@ -36,8 +36,9 @@ jobs:
     passthru: true
     tty: true
     steps:
+      - run: gotestsum < test.json
+        deferred: true
       - go test -cover -coverpkg github.com/titpetric/vuego/... -coverprofile=pkg.cov -json ./... > test.json
-      - cat test.json | gotestsum
 
   cover:
     desc: "Show source coverage"

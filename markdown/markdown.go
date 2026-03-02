@@ -9,16 +9,15 @@ import (
 	"regexp"
 	"strings"
 
-	vuego "github.com/titpetric/vuego"
-
 	"github.com/yuin/goldmark"
 	"github.com/yuin/goldmark/ast"
-	east "github.com/yuin/goldmark/extension/ast"
 	"github.com/yuin/goldmark/extension"
+	east "github.com/yuin/goldmark/extension/ast"
 	"github.com/yuin/goldmark/parser"
 	"github.com/yuin/goldmark/text"
-
 	yaml "gopkg.in/yaml.v3"
+
+	vuego "github.com/titpetric/vuego"
 )
 
 // PostProcessor transforms rendered HTML for a specific block type.

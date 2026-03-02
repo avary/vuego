@@ -64,6 +64,7 @@ func (v *Vue) propagateTemplateAttributes(ctx VueContext, node *html.Node) {
 				ctx.stack.stack = ctx.stack.stack[:topIdx]
 				ctx.stack.Set(boundName, val)
 				ctx.stack.stack = append(ctx.stack.stack, topMap)
+				ctx.stack.envCache = nil
 			}
 		}
 	}

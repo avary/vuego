@@ -137,6 +137,10 @@ type SlotScope struct {
 type Stack struct {
 	stack    []map[string]any // bottom..top, top is last element
 	rootData any              // original data passed to Render (for struct field fallback)
+
+	// envCache caches the flattened map from EnvMap().
+	// Invalidated on Push/Pop/Set. Stack is request-scoped so no mutex needed.
+	envCache map[string]any
 }
 ```
 
@@ -197,7 +201,7 @@ type Vue struct {
 	exprEval   *ExprEvaluator
 
 	// Template cache to avoid re-parsing the same template
-	templateCache map[string][]*html.Node
+	templateCache map[string]*templateCacheEntry
 	templateMu    sync.RWMutex
 
 	// Custom node processors for post-processing rendered DOM
@@ -594,7 +598,7 @@ func (*Stack) Copy() *Stack
 
 ### EnvMap
 
-EnvMap converts the Stack to a map[string]any for expr evaluation. Includes all accessible values from stack and struct fields.
+EnvMap converts the Stack to a map[string]any for expr evaluation. Includes all accessible values from stack and struct fields. The result is cached and reused until the stack is mutated via Push/Pop/Set.
 
 ```go
 func (*Stack) EnvMap() map[string]any

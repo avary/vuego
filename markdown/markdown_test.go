@@ -148,7 +148,7 @@ func TestRender_Paragraph(t *testing.T) {
 
 func TestRender_CodeBlock(t *testing.T) {
 	got := render(t, "```go\nfmt.Println(\"hi\")\n```")
-	assert.Contains(t, got, "<pre>")
+	assert.Contains(t, got, "<pre")
 	assert.Contains(t, got, "<code")
 	assert.Contains(t, got, "language-go")
 	assert.Contains(t, got, "fmt.Println")
@@ -156,8 +156,8 @@ func TestRender_CodeBlock(t *testing.T) {
 
 func TestRender_CodeBlockNoLanguage(t *testing.T) {
 	got := render(t, "```\nplain code\n```")
-	assert.Contains(t, got, "<pre>")
-	assert.Contains(t, got, "<code>")
+	assert.Contains(t, got, "<pre")
+	assert.Contains(t, got, "<code")
 	assert.Contains(t, got, "plain code")
 }
 

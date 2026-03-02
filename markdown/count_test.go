@@ -16,7 +16,10 @@ type CountingFS struct {
 	count atomic.Int64
 }
 
-func (c *CountingFS) Open(name string) (interface{ Read([]byte) (int, error); Close() error }, error) {
+func (c *CountingFS) Open(name string) (interface {
+	Read([]byte) (int, error)
+	Close() error
+}, error) {
 	c.count.Add(1)
 	return c.fs.Open(name)
 }

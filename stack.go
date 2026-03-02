@@ -46,6 +46,10 @@ func getCachedPath(expr string) []string {
 type Stack struct {
 	stack    []map[string]any // bottom..top, top is last element
 	rootData any              // original data passed to Render (for struct field fallback)
+
+	// envCache caches the flattened map from EnvMap().
+	// Invalidated on Push/Pop/Set. Stack is request-scoped so no mutex needed.
+	envCache map[string]any
 }
 
 // NewStack constructs a Stack with an optional initial root map (nil allowed).
@@ -85,6 +89,7 @@ func (s *Stack) Push(m map[string]any) {
 		m = mapPool.Get().(map[string]any)
 	}
 	s.stack = append(s.stack, m)
+	s.envCache = nil
 }
 
 // Pop the top-most Stack. If only root remains it still pops to empty slice safely.
@@ -107,6 +112,7 @@ func (s *Stack) Pop() {
 	if len(s.stack) == 0 {
 		s.stack = append(s.stack, map[string]any{})
 	}
+	s.envCache = nil
 }
 
 // Set sets a key in the top-most Stack.
@@ -115,6 +121,7 @@ func (s *Stack) Set(key string, val any) {
 		s.stack = append(s.stack, map[string]any{})
 	}
 	s.stack[len(s.stack)-1][key] = val
+	s.envCache = nil
 }
 
 // Lookup searches stack from top to bottom for a plain identifier (no dots).
@@ -283,7 +290,12 @@ func (s *Stack) GetMap(expr string) (map[string]any, bool) {
 
 // EnvMap converts the Stack to a map[string]any for expr evaluation.
 // Includes all accessible values from stack and struct fields.
+// The result is cached and reused until the stack is mutated via Push/Pop/Set.
 func (s *Stack) EnvMap() map[string]any {
+	if s.envCache != nil {
+		return s.envCache
+	}
+
 	result := make(map[string]any)
 	// Iterate through stack from bottom to top, with top overriding bottom
 	for i := 0; i < len(s.stack); i++ {
@@ -296,6 +308,8 @@ func (s *Stack) EnvMap() map[string]any {
 	if s.rootData != nil {
 		ireflect.PopulateStructFields(result, s.rootData)
 	}
+
+	s.envCache = result
 	return result
 }
 

@@ -243,6 +243,7 @@ func (v *Vue) evalSegment(ctx VueContext, seg pipeSegment, input any, isFirst, f
 		env := ctx.stack.EnvMap()
 		if input != nil {
 			env["."] = input
+			defer delete(env, ".")
 		}
 		result, err := v.exprEval.Eval(seg.expr, env)
 		if err != nil {

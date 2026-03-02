@@ -1,2 +1,2 @@
-<pre v-if="language"><code :class="'language-' + language">{{ code }}</code></pre>
-<pre v-else><code>{{ code }}</code></pre>
+<pre v-if="language" class="grid text-sm max-h-[650px] overflow-y-auto rounded-xl scrollbar"><code :class="'language-' + language + ' !bg-muted/40 !p-3.5'">{{ code }}</code></pre>
+<pre v-else class="grid text-sm max-h-[650px] overflow-y-auto rounded-xl scrollbar"><code class="!bg-muted/40 !p-3.5">{{ code }}</code></pre>
