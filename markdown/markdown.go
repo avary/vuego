@@ -24,12 +24,36 @@ import (
 // It receives the rendered HTML source and returns the transformed result.
 type PostProcessor func(src string) string
 
+// NodeType identifies the type of markdown node.
+type NodeType string
+
+// Limited functionality of node identifiers desired
+// to be rendered with a handler.
+const (
+	NodeParagraph NodeType = "paragraph"
+	NodeHeading   NodeType = "heading"
+	NodeCodeBlock NodeType = "code_block"
+)
+
+// Node provides information about a markdown node for custom handling.
+type Node struct {
+	Type     NodeType
+	Raw      string // raw source content
+	Language string // for code blocks
+	Level    int    // for headings (1-6)
+}
+
+// Handler processes a node, returning HTML if handled.
+// Multiple handlers are called in registration order until one returns handled=true.
+type Handler func(ctx context.Context, n *Node) (html string, handled bool)
+
 // Markdown parses GFM markdown and renders block elements through vuego templates.
 type Markdown struct {
 	contentFS      fs.FS
 	tpl            vuego.Template
 	parser         parser.Parser
 	postProcessors map[string]PostProcessor
+	handlers       map[NodeType][]Handler
 }
 
 // Document is a parsed markdown document ready for rendering.
@@ -64,6 +88,7 @@ func New(contentFS fs.FS) *Markdown {
 		tpl:            vuego.NewFS(tplFS),
 		parser:         md.Parser(),
 		postProcessors: make(map[string]PostProcessor),
+		handlers:       make(map[NodeType][]Handler),
 	}
 }
 
@@ -72,6 +97,23 @@ func New(contentFS fs.FS) *Markdown {
 func (m *Markdown) PostProcess(blockType string, fn PostProcessor) *Markdown {
 	m.postProcessors[blockType] = fn
 	return m
+}
+
+// Register adds a handler for a node type.
+// Multiple handlers are called in registration order until one returns handled=true.
+func (m *Markdown) Register(nodeType NodeType, h Handler) *Markdown {
+	m.handlers[nodeType] = append(m.handlers[nodeType], h)
+	return m
+}
+
+// tryHandlers calls registered handlers for a node type until one handles it.
+func (m *Markdown) tryHandlers(ctx context.Context, n *Node) (html string, handled bool) {
+	for _, h := range m.handlers[n.Type] {
+		if html, handled = h(ctx, n); handled {
+			return html, true
+		}
+	}
+	return "", false
 }
 
 // Load reads a markdown file from the content filesystem and parses it into a Document.
@@ -120,21 +162,31 @@ func splitFrontMatter(raw []byte) (map[string]any, []byte) {
 
 // Render writes the rendered HTML of the parsed document to w.
 func (d *Document) Render(w io.Writer) error {
-	return d.md.renderChildren(w, d.doc, d.src)
+	return d.RenderContext(context.Background(), w)
+}
+
+// RenderContext writes the rendered HTML of the parsed document to w with context.
+func (d *Document) RenderContext(ctx context.Context, w io.Writer) error {
+	return d.md.renderChildren(ctx, w, d.doc, d.src)
 }
 
 // RenderBytes parses markdown source bytes and writes rendered HTML to w.
 // Unlike Load, this does not read from the filesystem or parse front matter.
 func (m *Markdown) RenderBytes(w io.Writer, src []byte) error {
+	return m.RenderBytesContext(context.Background(), w, src)
+}
+
+// RenderBytesContext parses markdown source bytes and writes rendered HTML to w with context.
+func (m *Markdown) RenderBytesContext(ctx context.Context, w io.Writer, src []byte) error {
 	reader := text.NewReader(src)
 	doc := m.parser.Parse(reader)
-	return m.renderChildren(w, doc, src)
+	return m.renderChildren(ctx, w, doc, src)
 }
 
 // renderChildren renders all direct children of a node.
-func (m *Markdown) renderChildren(w io.Writer, node ast.Node, src []byte) error {
+func (m *Markdown) renderChildren(ctx context.Context, w io.Writer, node ast.Node, src []byte) error {
 	for child := node.FirstChild(); child != nil; child = child.NextSibling() {
-		if err := m.renderNode(w, child, src); err != nil {
+		if err := m.renderNode(ctx, w, child, src); err != nil {
 			return err
 		}
 	}
@@ -142,22 +194,22 @@ func (m *Markdown) renderChildren(w io.Writer, node ast.Node, src []byte) error 
 }
 
 // renderNode dispatches a single AST node to the appropriate template.
-func (m *Markdown) renderNode(w io.Writer, node ast.Node, src []byte) error {
+func (m *Markdown) renderNode(ctx context.Context, w io.Writer, node ast.Node, src []byte) error {
 	switch n := node.(type) {
 	case *ast.Heading:
-		return m.renderHeading(w, n, src)
+		return m.renderHeading(ctx, w, n, src)
 	case *ast.Paragraph:
-		return m.renderParagraph(w, n, src)
+		return m.renderParagraph(ctx, w, n, src)
 	case *ast.FencedCodeBlock:
-		return m.renderFencedCodeBlock(w, n, src)
+		return m.renderFencedCodeBlock(ctx, w, n, src)
 	case *ast.CodeBlock:
-		return m.renderCodeBlock(w, n, src)
+		return m.renderCodeBlock(ctx, w, n, src)
 	case *ast.Blockquote:
-		return m.renderBlockquote(w, n, src)
+		return m.renderBlockquote(ctx, w, n, src)
 	case *ast.List:
-		return m.renderList(w, n, src)
+		return m.renderList(ctx, w, n, src)
 	case *ast.ListItem:
-		return m.renderListItem(w, n, src)
+		return m.renderListItem(ctx, w, n, src)
 	case *ast.ThematicBreak:
 		return m.renderTemplate(w, "thematic_break", nil)
 	case *ast.HTMLBlock:
@@ -168,15 +220,25 @@ func (m *Markdown) renderNode(w io.Writer, node ast.Node, src []byte) error {
 		return m.renderTable(w, n, src)
 	default:
 		if node.HasChildren() {
-			return m.renderChildren(w, node, src)
+			return m.renderChildren(ctx, w, node, src)
 		}
 	}
 	return nil
 }
 
 // renderHeading renders a heading (h1-h6) with an auto-generated id.
-func (m *Markdown) renderHeading(w io.Writer, n *ast.Heading, src []byte) error {
+func (m *Markdown) renderHeading(ctx context.Context, w io.Writer, n *ast.Heading, src []byte) error {
 	content := m.inlineContent(n, src)
+
+	if html, handled := m.tryHandlers(ctx, &Node{
+		Type:  NodeHeading,
+		Raw:   content,
+		Level: n.Level,
+	}); handled {
+		_, err := io.WriteString(w, html)
+		return err
+	}
+
 	id := headingID(content)
 	return m.renderTemplate(w, "heading", map[string]any{
 		"level":   n.Level,
@@ -186,33 +248,65 @@ func (m *Markdown) renderHeading(w io.Writer, n *ast.Heading, src []byte) error 
 }
 
 // renderParagraph renders a paragraph block.
-func (m *Markdown) renderParagraph(w io.Writer, n *ast.Paragraph, src []byte) error {
+func (m *Markdown) renderParagraph(ctx context.Context, w io.Writer, n *ast.Paragraph, src []byte) error {
 	content := m.inlineContent(n, src)
+
+	if html, handled := m.tryHandlers(ctx, &Node{
+		Type: NodeParagraph,
+		Raw:  content,
+	}); handled {
+		_, err := io.WriteString(w, html)
+		return err
+	}
+
 	return m.renderTemplate(w, "paragraph", map[string]any{
 		"content": content,
 	})
 }
 
 // renderFencedCodeBlock renders a fenced code block with optional language.
-func (m *Markdown) renderFencedCodeBlock(w io.Writer, n *ast.FencedCodeBlock, src []byte) error {
+func (m *Markdown) renderFencedCodeBlock(ctx context.Context, w io.Writer, n *ast.FencedCodeBlock, src []byte) error {
+	language := string(n.Language(src))
+	code := codeBlockContent(n, src)
+
+	if html, handled := m.tryHandlers(ctx, &Node{
+		Type:     NodeCodeBlock,
+		Raw:      code,
+		Language: language,
+	}); handled {
+		_, err := io.WriteString(w, html)
+		return err
+	}
+
 	return m.renderTemplate(w, "code_block", map[string]any{
-		"language": string(n.Language(src)),
-		"code":     codeBlockContent(n, src),
+		"language": language,
+		"code":     code,
 	})
 }
 
 // renderCodeBlock renders an indented code block.
-func (m *Markdown) renderCodeBlock(w io.Writer, n *ast.CodeBlock, src []byte) error {
+func (m *Markdown) renderCodeBlock(ctx context.Context, w io.Writer, n *ast.CodeBlock, src []byte) error {
+	code := codeBlockContent(n, src)
+
+	if html, handled := m.tryHandlers(ctx, &Node{
+		Type:     NodeCodeBlock,
+		Raw:      code,
+		Language: "",
+	}); handled {
+		_, err := io.WriteString(w, html)
+		return err
+	}
+
 	return m.renderTemplate(w, "code_block", map[string]any{
 		"language": "",
-		"code":     codeBlockContent(n, src),
+		"code":     code,
 	})
 }
 
 // renderBlockquote renders a blockquote, recursing into child blocks.
-func (m *Markdown) renderBlockquote(w io.Writer, n *ast.Blockquote, src []byte) error {
+func (m *Markdown) renderBlockquote(ctx context.Context, w io.Writer, n *ast.Blockquote, src []byte) error {
 	var buf bytes.Buffer
-	if err := m.renderChildren(&buf, n, src); err != nil {
+	if err := m.renderChildren(ctx, &buf, n, src); err != nil {
 		return err
 	}
 	return m.renderTemplate(w, "blockquote", map[string]any{
@@ -221,9 +315,9 @@ func (m *Markdown) renderBlockquote(w io.Writer, n *ast.Blockquote, src []byte) 
 }
 
 // renderList renders an ordered or unordered list.
-func (m *Markdown) renderList(w io.Writer, n *ast.List, src []byte) error {
+func (m *Markdown) renderList(ctx context.Context, w io.Writer, n *ast.List, src []byte) error {
 	var buf bytes.Buffer
-	if err := m.renderChildren(&buf, n, src); err != nil {
+	if err := m.renderChildren(ctx, &buf, n, src); err != nil {
 		return err
 	}
 	return m.renderTemplate(w, "list", map[string]any{
@@ -234,9 +328,9 @@ func (m *Markdown) renderList(w io.Writer, n *ast.List, src []byte) error {
 }
 
 // renderListItem renders a single list item.
-func (m *Markdown) renderListItem(w io.Writer, n *ast.ListItem, src []byte) error {
+func (m *Markdown) renderListItem(ctx context.Context, w io.Writer, n *ast.ListItem, src []byte) error {
 	var buf bytes.Buffer
-	if err := m.renderChildren(&buf, n, src); err != nil {
+	if err := m.renderChildren(ctx, &buf, n, src); err != nil {
 		return err
 	}
 	return m.renderTemplate(w, "list_item", map[string]any{

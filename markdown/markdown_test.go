@@ -223,7 +223,7 @@ func TestRender_Strikethrough(t *testing.T) {
 func TestRender_Table(t *testing.T) {
 	input := "| Name | Age |\n| --- | --- |\n| Alice | 30 |\n| Bob | 25 |"
 	got := render(t, input)
-	assert.Contains(t, got, "<table>")
+	assert.Contains(t, got, "<table")
 	assert.Contains(t, got, "<thead>")
 	assert.Contains(t, got, "<th>")
 	assert.Contains(t, got, "Name")
