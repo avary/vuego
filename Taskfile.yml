@@ -2,7 +2,6 @@
 version: "3"
 
 includes:
-  mdox: ./Taskfile.mdox.yml
   gofsck: ./Taskfile.gofsck.yml
 
 tasks:
