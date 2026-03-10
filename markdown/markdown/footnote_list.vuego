@@ -1,0 +1,5 @@
+<section class="footnotes" role="doc-endnotes">
+<hr>
+<h2 id="references">References</h2>
+<ol v-html="content"></ol>
+</section>

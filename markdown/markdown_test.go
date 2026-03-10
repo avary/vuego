@@ -26,6 +26,10 @@ func TestTemplates(t *testing.T) {
 		"code_block.vuego",
 		"code_span.vuego",
 		"emphasis.vuego",
+		"footnote.vuego",
+		"footnote_backlink.vuego",
+		"footnote_link.vuego",
+		"footnote_list.vuego",
 		"hard_break.vuego",
 		"heading.vuego",
 		"image.vuego",
@@ -264,4 +268,42 @@ func TestPostProcess_Heading(t *testing.T) {
 	err = doc.Render(&buf)
 	assert.NoError(t, err)
 	assert.Contains(t, buf.String(), `class="title"`)
+}
+
+func TestRender_Footnote(t *testing.T) {
+	input := `This is a sentence with a footnote[^1].
+
+[^1]: This is the footnote content.`
+	got := render(t, input)
+
+	// Should have a footnote link in the text
+	assert.Contains(t, got, `<sup id="fnref:1"`)
+	assert.Contains(t, got, `href="#fn:1"`)
+
+	// Should have a footnote list section
+	assert.Contains(t, got, `<section class="footnotes"`)
+	assert.Contains(t, got, `<li id="fn:1"`)
+	assert.Contains(t, got, "This is the footnote content")
+
+	// Should have a backlink
+	assert.Contains(t, got, `href="#fnref:1"`)
+}
+
+func TestRender_MultipleFootnotes(t *testing.T) {
+	input := `First[^1] and second[^2].
+
+[^1]: First note.
+[^2]: Second note with [link](https://example.com).`
+	got := render(t, input)
+
+	// Both footnote references
+	assert.Contains(t, got, `id="fnref:1"`)
+	assert.Contains(t, got, `id="fnref:2"`)
+
+	// Both footnote definitions
+	assert.Contains(t, got, `id="fn:1"`)
+	assert.Contains(t, got, `id="fn:2"`)
+	assert.Contains(t, got, "First note")
+	assert.Contains(t, got, "Second note")
+	assert.Contains(t, got, "example.com")
 }

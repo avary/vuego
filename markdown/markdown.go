@@ -81,7 +81,10 @@ func New(contentFS fs.FS) *Markdown {
 		tplFS = Templates()
 	}
 
-	md := goldmark.New(goldmark.WithExtensions(extension.GFM))
+	md := goldmark.New(goldmark.WithExtensions(
+		extension.GFM,
+		extension.Footnote,
+	))
 
 	return &Markdown{
 		contentFS:      contentFS,
@@ -218,6 +221,10 @@ func (m *Markdown) renderNode(ctx context.Context, w io.Writer, node ast.Node, s
 		return m.renderInlineChildren(w, n, src)
 	case *east.Table:
 		return m.renderTable(w, n, src)
+	case *east.FootnoteList:
+		return m.renderFootnoteList(ctx, w, n, src)
+	case *east.Footnote:
+		return m.renderFootnote(ctx, w, n, src)
 	default:
 		if node.HasChildren() {
 			return m.renderChildren(ctx, w, node, src)
@@ -466,6 +473,16 @@ func (m *Markdown) renderInlineNode(w io.Writer, node ast.Node, src []byte) erro
 		return m.renderTemplate(w, "task_checkbox", map[string]any{
 			"checked": n.IsChecked,
 		})
+	case *east.FootnoteLink:
+		return m.renderTemplate(w, "footnote_link", map[string]any{
+			"index":     n.Index,
+			"ref_count": n.RefCount,
+			"ref_index": n.RefIndex,
+		})
+	case *east.FootnoteBacklink:
+		return m.renderTemplate(w, "footnote_backlink", map[string]any{
+			"index": n.Index,
+		})
 	default:
 		return m.renderInlineChildren(w, node, src)
 	}
@@ -476,6 +493,31 @@ func (m *Markdown) inlineContent(node ast.Node, src []byte) string {
 	var buf bytes.Buffer
 	_ = m.renderInlineChildren(&buf, node, src)
 	return buf.String()
+}
+
+// renderFootnoteList renders the container for all footnotes.
+func (m *Markdown) renderFootnoteList(ctx context.Context, w io.Writer, n *east.FootnoteList, src []byte) error {
+	var buf bytes.Buffer
+	if err := m.renderChildren(ctx, &buf, n, src); err != nil {
+		return err
+	}
+	return m.renderTemplate(w, "footnote_list", map[string]any{
+		"count":   n.Count,
+		"content": buf.String(),
+	})
+}
+
+// renderFootnote renders an individual footnote.
+func (m *Markdown) renderFootnote(ctx context.Context, w io.Writer, n *east.Footnote, src []byte) error {
+	var buf bytes.Buffer
+	if err := m.renderChildren(ctx, &buf, n, src); err != nil {
+		return err
+	}
+	return m.renderTemplate(w, "footnote", map[string]any{
+		"index":   n.Index,
+		"ref":     string(n.Ref),
+		"content": buf.String(),
+	})
 }
 
 // renderTemplate renders a vuego template with data, applying any registered post-processor.
