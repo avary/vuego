@@ -78,6 +78,55 @@ func TestVue_EvalVHtml(t *testing.T) {
 	}
 }
 
+func TestVue_EvalVHtml_NoReinterpolation(t *testing.T) {
+	tests := []struct {
+		name     string
+		template string
+		data     map[string]any
+		expected string
+	}{
+		{
+			name:     "v-html preserves interpolation syntax in variable value",
+			template: "<code v-html=\"code\"></code>",
+			data:     map[string]any{"code": `echo "${{ version }}"`},
+			expected: `<code>echo "${{ version }}"</code>`,
+		},
+		{
+			name:     "v-html does not re-interpolate variable contents",
+			template: "<div v-html=\"content\"></div>",
+			data:     map[string]any{"content": "{{ name }}", "name": "Alice"},
+			expected: "<div>{{ name }}</div>",
+		},
+		{
+			name:     "v-html with HTML containing interpolation-like syntax",
+			template: "<div v-html=\"html\"></div>",
+			data:     map[string]any{"html": "<p>Use {{ variable }} in templates</p>"},
+			expected: "<div><p>Use {{ variable }} in templates</p></div>",
+		},
+		{
+			name:     "v-html with pipe-like content not treated as filter",
+			template: "<div v-html=\"content\"></div>",
+			data:     map[string]any{"content": "value | filter"},
+			expected: "<div>value | filter</div>",
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			template := []byte(tc.template)
+			fs := fstest.MapFS{
+				"test.vuego": &fstest.MapFile{Data: template},
+			}
+			vue := vuego.NewVue(fs)
+
+			var buf bytes.Buffer
+			err := vue.RenderFragment(&buf, "test.vuego", tc.data)
+			require.NoError(t, err)
+			diff.EqualHTML(t, []byte(tc.expected), buf.Bytes(), nil, nil)
+		})
+	}
+}
+
 func TestVue_EvalVHtml_PreservesWhitespace(t *testing.T) {
 	// Test that v-html content preserves its original whitespace without re-indenting
 	tests := []struct {

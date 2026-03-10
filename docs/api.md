@@ -321,7 +321,8 @@ type VueContextOptions struct {
 
 ### GetSlotName
 
-GetSlotName extracts the slot name from a v-slot directive. Returns "default" if no name is specified.
+GetSlotName extracts the slot name from a v-slot directive.
+Returns "default" if no name is specified.
 
 ```go
 func GetSlotName(attr string) string
@@ -329,7 +330,10 @@ func GetSlotName(attr string) string
 
 ### New
 
-New creates a new Template for rendering strings, bytes, or readers without a filesystem. Use this when templates are provided as strings/bytes rather than loaded from files. To render from files, use NewFS(fs) or New(WithFS(fs)) instead. The returned Template can be used for variable assignment and rendering.
+New creates a new Template for rendering strings, bytes, or readers without a filesystem.
+Use this when templates are provided as strings/bytes rather than loaded from files.
+To render from files, use NewFS(fs) or New(WithFS(fs)) instead.
+The returned Template can be used for variable assignment and rendering.
 
 ```go
 func New(opts ...LoadOption) Template
@@ -345,7 +349,8 @@ func NewExprEvaluator() *ExprEvaluator
 
 ### NewFS
 
-NewFS creates a new Template with access to the given filesystem and optional configurations. The returned Template can be used to render files, strings, or bytes with variable assignment.
+NewFS creates a new Template with access to the given filesystem and optional configurations.
+The returned Template can be used to render files, strings, or bytes with variable assignment.
 
 ```go
 func NewFS(templateFS fs.FS, opts ...LoadOption) Template
@@ -393,7 +398,8 @@ func NewSlotScope() *SlotScope
 
 ### NewStack
 
-NewStack constructs a Stack with an optional initial root map (nil allowed). The originalData parameter is the original value passed to Render (for struct field fallback).
+NewStack constructs a Stack with an optional initial root map (nil allowed).
+The originalData parameter is the original value passed to Render (for struct field fallback).
 
 ```go
 func NewStack(root map[string]any) *Stack
@@ -409,7 +415,8 @@ func NewStackWithData(root map[string]any, originalData any) *Stack
 
 ### NewVue
 
-NewVue creates a new Vue backed by the given filesystem. The returned Vue is safe for concurrent use by multiple goroutines.
+NewVue creates a new Vue backed by the given filesystem.
+The returned Vue is safe for concurrent use by multiple goroutines.
 
 ```go
 func NewVue(templateFS fs.FS) *Vue
@@ -425,7 +432,8 @@ func NewVueContext(fromFilename string, options *VueContextOptions) VueContext
 
 ### View
 
-View is a type safety shim to bind a template file to a data model type. The returned template should be rendered and discarded.
+View is a type safety shim to bind a template file to a data model type.
+The returned template should be rendered and discarded.
 
 ```go
 func View(renderer Template, filename string, data V) Template
@@ -433,7 +441,9 @@ func View(renderer Template, filename string, data V) Template
 
 ### WithComponents
 
-WithComponents returns a LoadOption that registers all component shorthands. It recursively loads all .vuego files from the components folder and subfolders. File paths are mapped to kebab-case tag names using directory path and filename.
+WithComponents returns a LoadOption that registers all component shorthands.
+It recursively loads all .vuego files from the components folder and subfolders.
+File paths are mapped to kebab-case tag names using directory path and filename.
 
 ```go
 func WithComponents() LoadOption
@@ -481,7 +491,9 @@ func (*ExprEvaluator) ClearCache()
 
 ### Eval
 
-Eval evaluates an expression against the given environment (stack). It returns the result value and any error. The expression can contain:
+Eval evaluates an expression against the given environment (stack).
+It returns the result value and any error.
+The expression can contain:
 - Variable references: item, item.title, items[0]
 - Comparison: ==, !=, <, >, <=, >=, === (same as ==, for convenience)
 - Boolean operations: &&, ||, !
@@ -534,7 +546,8 @@ func (*Loader) Load(filename string) ([]*html.Node, error)
 
 ### LoadFragment
 
-LoadFragment parses a template fragment; if the file is a full document, it falls back to Load. Front-matter is extracted and discarded; use loadFragment to access it.
+LoadFragment parses a template fragment; if the file is a full document, it falls back to Load.
+Front-matter is extracted and discarded; use loadFragment to access it.
 
 ```go
 func (*Loader) LoadFragment(filename string) ([]*html.Node, error)
@@ -574,7 +587,8 @@ func (*OverlayFS) ReadDir(name string) ([]fs.DirEntry, error)
 
 ### GetSlot
 
-GetSlot retrieves slot content by name. Returns nil if the slot doesn't exist.
+GetSlot retrieves slot content by name.
+Returns nil if the slot doesn't exist.
 
 ```go
 func (*SlotScope) GetSlot(name string) *SlotContent
@@ -590,7 +604,8 @@ func (*SlotScope) SetSlot(name string, content *SlotContent)
 
 ### Copy
 
-Copy returns a copy of the stack that can be discarded. The root data is retained as is, the envmap is a copy.
+Copy returns a copy of the stack that can be discarded.
+The root data is retained as is, the envmap is a copy.
 
 ```go
 func (*Stack) Copy() *Stack
@@ -598,7 +613,9 @@ func (*Stack) Copy() *Stack
 
 ### EnvMap
 
-EnvMap converts the Stack to a map[string]any for expr evaluation. Includes all accessible values from stack and struct fields. The result is cached and reused until the stack is mutated via Push/Pop/Set.
+EnvMap converts the Stack to a map[string]any for expr evaluation.
+Includes all accessible values from stack and struct fields.
+The result is cached and reused until the stack is mutated via Push/Pop/Set.
 
 ```go
 func (*Stack) EnvMap() map[string]any
@@ -606,7 +623,9 @@ func (*Stack) EnvMap() map[string]any
 
 ### ForEach
 
-ForEach iterates over a collection at the given expr and calls fn(index,value). Supports slices/arrays and map[string]any (iteration order for maps is unspecified). If fn returns an error iteration is stopped and the error passed through.
+ForEach iterates over a collection at the given expr and calls fn(index,value).
+Supports slices/arrays and map[string]any (iteration order for maps is unspecified).
+If fn returns an error iteration is stopped and the error passed through.
 
 ```go
 func (*Stack) ForEach(expr string, fn func(index int, value any) error) error
@@ -622,7 +641,8 @@ func (*Stack) GetInt(expr string) (int, bool)
 
 ### GetMap
 
-GetMap returns map[string]any or converts map[string]string to map[string]any. Avoids reflection for other map types.
+GetMap returns map[string]any or converts map[string]string to map[string]any.
+Avoids reflection for other map types.
 
 ```go
 func (*Stack) GetMap(expr string) (map[string]any, bool)
@@ -646,7 +666,9 @@ func (*Stack) GetString(expr string) (string, bool)
 
 ### Lookup
 
-Lookup searches stack from top to bottom for a plain identifier (no dots). If not found in the stack maps, it checks the root data struct (if any). Returns (value, true) if found.
+Lookup searches stack from top to bottom for a plain identifier (no dots).
+If not found in the stack maps, it checks the root data struct (if any).
+Returns (value, true) if found.
 
 ```go
 func (*Stack) Lookup(name string) (any, bool)
@@ -654,7 +676,8 @@ func (*Stack) Lookup(name string) (any, bool)
 
 ### Pop
 
-Pop the top-most Stack. If only root remains it still pops to empty slice safely. Returns pooled maps to reduce GC pressure.
+Pop the top-most Stack. If only root remains it still pops to empty slice safely.
+Returns pooled maps to reduce GC pressure.
 
 ```go
 func (*Stack) Pop()
@@ -662,7 +685,8 @@ func (*Stack) Pop()
 
 ### Push
 
-Push a new map as a top-most Stack. If m is nil, an empty map is obtained from the pool.
+Push a new map as a top-most Stack.
+If m is nil, an empty map is obtained from the pool.
 
 ```go
 func (*Stack) Push(m map[string]any)
@@ -700,7 +724,8 @@ func (*Vue) DefaultFuncMap() FuncMap
 
 ### Funcs
 
-Funcs merges custom template functions into the existing funcmap, overwriting any existing keys. Returns the Vue instance for chaining.
+Funcs merges custom template functions into the existing funcmap, overwriting any existing keys.
+Returns the Vue instance for chaining.
 
 ```go
 func (*Vue) Funcs(funcMap FuncMap) *Vue
@@ -708,7 +733,8 @@ func (*Vue) Funcs(funcMap FuncMap) *Vue
 
 ### GetComponentFile
 
-GetComponentFile looks up a component file by its kebab-case tag name. Returns the filename and true if found, otherwise returns empty string and false.
+GetComponentFile looks up a component file by its kebab-case tag name.
+Returns the filename and true if found, otherwise returns empty string and false.
 
 ```go
 func (*Vue) GetComponentFile(tagName string) (string, bool)
@@ -716,7 +742,8 @@ func (*Vue) GetComponentFile(tagName string) (string, bool)
 
 ### RegisterComponent
 
-RegisterComponent registers a component shorthand mapping. The tagName (e.g., "button-primary") will be resolved to the given filename (e.g., "components/ButtonPrimary.vuego").
+RegisterComponent registers a component shorthand mapping.
+The tagName (e.g., "button-primary") will be resolved to the given filename (e.g., "components/ButtonPrimary.vuego").
 
 ```go
 func (*Vue) RegisterComponent(tagName, filename string) *Vue
@@ -724,7 +751,8 @@ func (*Vue) RegisterComponent(tagName, filename string) *Vue
 
 ### RegisterNodeProcessor
 
-RegisterNodeProcessor adds a custom node processor to the Vue instance. Processors are applied in order after template evaluation completes.
+RegisterNodeProcessor adds a custom node processor to the Vue instance.
+Processors are applied in order after template evaluation completes.
 
 ```go
 func (*Vue) RegisterNodeProcessor(processor NodeProcessor) *Vue
@@ -732,7 +760,9 @@ func (*Vue) RegisterNodeProcessor(processor NodeProcessor) *Vue
 
 ### Render
 
-Render processes a full-page template file and writes the output to w. Front-matter data in the template is authoritative and overrides passed data. Render is safe to call concurrently from multiple goroutines.
+Render processes a full-page template file and writes the output to w.
+Front-matter data in the template is authoritative and overrides passed data.
+Render is safe to call concurrently from multiple goroutines.
 
 ```go
 func (*Vue) Render(w io.Writer, filename string, data any) error
@@ -740,7 +770,9 @@ func (*Vue) Render(w io.Writer, filename string, data any) error
 
 ### RenderFragment
 
-RenderFragment processes a template fragment file and writes the output to w. Front-matter data in the template is authoritative and overrides passed data. RenderFragment is safe to call concurrently from multiple goroutines.
+RenderFragment processes a template fragment file and writes the output to w.
+Front-matter data in the template is authoritative and overrides passed data.
+RenderFragment is safe to call concurrently from multiple goroutines.
 
 ```go
 func (*Vue) RenderFragment(w io.Writer, filename string, data any) error
@@ -748,7 +780,8 @@ func (*Vue) RenderFragment(w io.Writer, filename string, data any) error
 
 ### RenderNodes
 
-RenderNodes evaluates and renders HTML nodes with the given data. This is the core rendering function used by all public render methods.
+RenderNodes evaluates and renders HTML nodes with the given data.
+This is the core rendering function used by all public render methods.
 
 ```go
 func (*Vue) RenderNodes(w io.Writer, nodes []*html.Node, data any) error
@@ -788,7 +821,8 @@ func (VueContext) FormatTemplateChain() string
 
 ### Stack
 
-Stack returns the variable resolution stack for this context. This allows functions with *VueContext parameters to resolve variables from the execution scope.
+Stack returns the variable resolution stack for this context.
+This allows functions with *VueContext parameters to resolve variables from the execution scope.
 
 ```go
 func (VueContext) Stack() *Stack

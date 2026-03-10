@@ -66,6 +66,18 @@ func TestVue_EvalVText(t *testing.T) {
 			data:     map[string]any{"msg": "hello"},
 			expected: "<span>hello</span>",
 		},
+		{
+			name:     "v-text preserves interpolation syntax in variable value",
+			template: "<code v-text=\"code\"></code>",
+			data:     map[string]any{"code": `echo "${{ version }}"`},
+			expected: `<code>echo &quot;${{ version }}&quot;</code>`,
+		},
+		{
+			name:     "v-text does not re-interpolate variable contents",
+			template: "<div v-text=\"content\"></div>",
+			data:     map[string]any{"content": "{{ name }}", "name": "Alice"},
+			expected: "<div>{{ name }}</div>",
+		},
 	}
 
 	for _, tc := range tests {

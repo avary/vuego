@@ -24,6 +24,13 @@ func (v *Vue) evalAttributes(ctx VueContext, n *html.Node) (map[string]any, erro
 		key := a.Key
 		val := strings.TrimSpace(a.Val)
 
+		// Skip internal attributes that hold already-evaluated content
+		// These should not be re-interpolated
+		if key == "data-v-text-content" || key == "data-v-html-content" {
+			newAttrs = append(newAttrs, html.Attribute{Key: key, Val: val})
+			continue
+		}
+
 		boundValue := val
 		boundName := key
 		// literal bindings

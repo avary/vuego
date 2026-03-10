@@ -453,6 +453,67 @@ func TestVue_ParseObjectPairs_EdgeCases(t *testing.T) {
 	}
 }
 
+func TestVue_EvalAttributes_BoundVsInterpolated(t *testing.T) {
+	tests := []struct {
+		name     string
+		template string
+		data     map[string]any
+		expected string
+	}{
+		{
+			name:     "bound attr does not re-interpolate value",
+			template: `<div :title="content"></div>`,
+			data:     map[string]any{"content": "{{ name }}", "name": "Alice"},
+			expected: `<div title="{{ name }}"></div>`,
+		},
+		{
+			name:     "interpolated attr evaluates mustache syntax",
+			template: `<div title="{{ content }}"></div>`,
+			data:     map[string]any{"content": "hello"},
+			expected: `<div title="hello"></div>`,
+		},
+		{
+			name:     "bound attr preserves interpolation-like syntax in value",
+			template: `<span :data-code="code"></span>`,
+			data:     map[string]any{"code": `echo "${{ version }}"`},
+			expected: `<span data-code="echo &#34;${{ version }}&#34;"></span>`,
+		},
+		{
+			name:     "interpolated attr evaluates nested interpolation",
+			template: `<div data-info="prefix-{{ value }}-suffix"></div>`,
+			data:     map[string]any{"value": "middle"},
+			expected: `<div data-info="prefix-middle-suffix"></div>`,
+		},
+		{
+			name:     "bound attr with pipe-like value is not filtered",
+			template: `<div :title="text"></div>`,
+			data:     map[string]any{"text": "a | b"},
+			expected: `<div title="a | b"></div>`,
+		},
+		{
+			name:     "bound and interpolated produce same result for simple string",
+			template: `<div :title="msg" data-alt="{{ msg }}"></div>`,
+			data:     map[string]any{"msg": "hello"},
+			expected: `<div title="hello" data-alt="hello"></div>`,
+		},
+	}
+
+	for _, tc := range tests {
+		t.Run(tc.name, func(t *testing.T) {
+			template := []byte(tc.template)
+			fs := fstest.MapFS{
+				"test.vuego": &fstest.MapFile{Data: template},
+			}
+			vue := vuego.NewVue(fs)
+
+			var buf bytes.Buffer
+			err := vue.RenderFragment(&buf, "test.vuego", tc.data)
+			require.NoError(t, err)
+			diff.EqualHTML(t, []byte(tc.expected), buf.Bytes(), nil, nil)
+		})
+	}
+}
+
 func TestVue_EvalAttributes_MultipleBindings(t *testing.T) {
 	tests := []struct {
 		name     string

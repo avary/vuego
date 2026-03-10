@@ -38,7 +38,7 @@ jobs:
     steps:
       - run: gotestsum < test.json
         deferred: true
-      - go test -cover -coverpkg github.com/titpetric/vuego/... -coverprofile=pkg.cov -json ./... > test.json
+      - go test -count 1 -cover -coverpkg github.com/titpetric/vuego/... -coverprofile=pkg.cov -json ./... > test.json
 
   cover:
     desc: "Show source coverage"
@@ -50,4 +50,4 @@ jobs:
       - go-fsck coverage -c pkg.cov.json -o go-fsck.json
       - go-fsck coverage --template=docs/testing-coverage.md.tpl -v > docs/testing-coverage.md
       - perl -pi -e 's/github.com\/titpetric/titpetric/g' docs/testing-coverage.md
-      - task mdox:fmt
+      - task: mdox:fmt

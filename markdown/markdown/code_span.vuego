@@ -1,1 +1,1 @@
-<code>{{ content }}</code>
+<code v-text="content"></code>
