@@ -19,7 +19,7 @@ Low cognitive complexity means there are few conditional branches to cover. Test
 | ✅     | titpetric/vuego/internal/parser  | 84.60%   | 6         | 25    |
 | ✅     | titpetric/vuego/internal/reflect | 94.50%   | 61        | 224   |
 | ✅     | titpetric/vuego/internal/ulid    | 50.00%   | 0         | 20    |
-| ❌     | titpetric/vuego/markdown         | 70.36%   | 56        | 466   |
+| ❌     | titpetric/vuego/markdown         | 70.82%   | 58        | 506   |
 
 ## Functions
 
@@ -288,13 +288,15 @@ Low cognitive complexity means there are few conditional branches to cover. Test
 | ✅     | titpetric/vuego/markdown         | Markdown.renderChildren           | 75.00%   | 3         |
 | ❌     | titpetric/vuego/markdown         | Markdown.renderCodeBlock          | 0.00%    | 1         |
 | ✅     | titpetric/vuego/markdown         | Markdown.renderFencedCodeBlock    | 66.70%   | 1         |
+| ✅     | titpetric/vuego/markdown         | Markdown.renderFootnote           | 75.00%   | 1         |
+| ✅     | titpetric/vuego/markdown         | Markdown.renderFootnoteList       | 75.00%   | 1         |
 | ❌     | titpetric/vuego/markdown         | Markdown.renderHTMLBlock          | 0.00%    | 3         |
 | ✅     | titpetric/vuego/markdown         | Markdown.renderHeading            | 66.70%   | 1         |
 | ✅     | titpetric/vuego/markdown         | Markdown.renderInlineChildren     | 75.00%   | 3         |
-| ❌     | titpetric/vuego/markdown         | Markdown.renderInlineNode         | 45.70%   | 10        |
+| ❌     | titpetric/vuego/markdown         | Markdown.renderInlineNode         | 48.60%   | 10        |
 | ✅     | titpetric/vuego/markdown         | Markdown.renderList               | 75.00%   | 1         |
 | ✅     | titpetric/vuego/markdown         | Markdown.renderListItem           | 75.00%   | 1         |
-| ✅     | titpetric/vuego/markdown         | Markdown.renderNode               | 66.70%   | 3         |
+| ✅     | titpetric/vuego/markdown         | Markdown.renderNode               | 70.60%   | 3         |
 | ✅     | titpetric/vuego/markdown         | Markdown.renderParagraph          | 60.00%   | 1         |
 | ✅     | titpetric/vuego/markdown         | Markdown.renderTable              | 100.00%  | 3         |
 | ✅     | titpetric/vuego/markdown         | Markdown.renderTemplate           | 88.90%   | 2         |
