@@ -18,8 +18,6 @@ github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
 github.com/titpetric/lessgo v0.1.0 h1:TrssCXiQPw3zZ4qIzVg7wytZXQz7ir3mGv6LYDzeVj0=
 github.com/titpetric/lessgo v0.1.0/go.mod h1:VKjDECI8RxTqRmbBRi4y1rAyldGAHuiZohAHGGkTo6g=
-github.com/titpetric/platform v0.4.1 h1:t0p5J7zUsy1yevViwSZ7d5REErqTY4WIqvZ/q1ajdTk=
-github.com/titpetric/platform v0.4.1/go.mod h1:/k8YO53RBN2Pj1uUFsx0H1/oc7qEOE4v6MV4iIgpGxY=
 github.com/yuin/goldmark v1.7.16 h1:n+CJdUxaFMiDUNnWC3dMWCIQJSkxH4uz3ZwQBkAlVNE=
 github.com/yuin/goldmark v1.7.16/go.mod h1:ip/1k0VRfGynBgxOz0yCqHrbZXhcjxyuS66Brc7iBKg=
 golang.org/x/net v0.52.0 h1:He/TN1l0e4mmR3QqHMT2Xab3Aj3L9qjbhRm78/6jrW0=

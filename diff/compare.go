@@ -5,7 +5,7 @@ import (
 	"strings"
 	"testing"
 
-	"github.com/titpetric/platform/pkg/require"
+	"github.com/stretchr/testify/require"
 	"golang.org/x/net/html"
 )
 
