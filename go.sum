@@ -16,8 +16,8 @@ github.com/rogpeppe/go-internal v1.14.1 h1:UQB4HGPB6osV0SQTLymcB4TgvyWu6ZyliaW0t
 github.com/rogpeppe/go-internal v1.14.1/go.mod h1:MaRKkUm5W0goXpeCfT7UZI6fk/L7L7so1lCWt35ZSgc=
 github.com/stretchr/testify v1.11.1 h1:7s2iGBzp5EwR7/aIZr8ao5+dra3wiQyKjjFuvgVKu7U=
 github.com/stretchr/testify v1.11.1/go.mod h1:wZwfW3scLgRK+23gO65QZefKpKQRnfz6sD981Nm4B6U=
-github.com/titpetric/lessgo v0.1.0 h1:TrssCXiQPw3zZ4qIzVg7wytZXQz7ir3mGv6LYDzeVj0=
-github.com/titpetric/lessgo v0.1.0/go.mod h1:VKjDECI8RxTqRmbBRi4y1rAyldGAHuiZohAHGGkTo6g=
+github.com/titpetric/lessgo v0.1.1 h1:q2gZtOx5JEs69RVe37ajnIXxz8JBk6tI+fVt0s0cbOY=
+github.com/titpetric/lessgo v0.1.1/go.mod h1:AKjim5vLR5vM5ZImUV8velOmv4UyPMb+kqPjkm9wlJM=
 github.com/yuin/goldmark v1.7.17 h1:p36OVWwRb246iHxA/U4p8OPEpOTESm4n+g+8t0EE5uA=
 github.com/yuin/goldmark v1.7.17/go.mod h1:ip/1k0VRfGynBgxOz0yCqHrbZXhcjxyuS66Brc7iBKg=
 golang.org/x/net v0.52.0 h1:He/TN1l0e4mmR3QqHMT2Xab3Aj3L9qjbhRm78/6jrW0=
