@@ -66,25 +66,25 @@ Vuego comes with several built-in utility functions:
 
 ### String Functions
 
-- **`upper`** - Converts string to uppercase
+- `upper` - Converts string to uppercase
 
   ```html
   {{ name | upper }}  <!-- "john" -> "JOHN" -->
   ```
 
-- **`lower`** - Converts string to lowercase
+- `lower` - Converts string to lowercase
 
   ```html
   {{ name | lower }}  <!-- "JOHN" -> "john" -->
   ```
 
-- **`title`** - Title-cases string
+- `title` - Title-cases string
 
   ```html
   {{ name | title }}  <!-- "john doe" -> "John Doe" -->
   ```
 
-- **`trim`** - Removes leading and trailing whitespace
+- `trim` - Removes leading and trailing whitespace
 
   ```html
   {{ text | trim }}  <!-- "  hello  " -> "hello" -->
@@ -92,39 +92,39 @@ Vuego comes with several built-in utility functions:
 
 ### Utility Functions
 
-- **`default(fallback)`** - Returns fallback value if input is nil or empty
+- `default(fallback)` - Returns fallback value if input is nil or empty
 
   ```html
   {{ name | default("Anonymous") }}
   ```
 
-- **`len`** - Returns length of string, array, or map
+- `len` - Returns length of string, array, or map
 
   ```html
   {{ items | len }}
   <div v-if="len(items)">Has items</div>
   ```
 
-- **`escape`** - HTML-escapes the value
+- `escape` - HTML-escapes the value
 
   ```html
   {{ userInput | escape }}
   ```
 
-- **`int`** - Converts value to integer
+- `int` - Converts value to integer
 
   ```html
   {{ stringValue | int }}
   <div v-if="int(count) > 0">Count is positive</div>
   ```
 
-- **`string`** - Converts value to string
+- `string` - Converts value to string
 
   ```html
   {{ count | string }}
   ```
 
-- **`json`** - Converts value to JSON string
+- `json` - Converts value to JSON string
 
   ```html
   {{ data | json }}
@@ -133,7 +133,7 @@ Vuego comes with several built-in utility functions:
 
 ### Date/Time Functions
 
-- **`formatTime(layout)`** - Formats time.Time using Go layout format
+- `formatTime(layout)` - Formats time.Time using Go layout format
 
   ```html
   {{ timestamp | formatTime("2006-01-02 15:04:05") }}
@@ -256,5 +256,5 @@ The error includes:
 - Additional arguments can be passed using function call syntax: `fn(arg1, arg2)`
 - Arguments can be string literals (quoted) or variable references
 - In `v-if` conditions, functions can be called directly: `v-if="len(items)"`
-- **Template rendering fails with an error if a function doesn't exist or has type mismatches**
+- Template rendering fails with an error if a function doesn't exist or has type mismatches
 - All interpolated values are HTML-escaped by default for security

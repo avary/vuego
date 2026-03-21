@@ -92,9 +92,9 @@ Test fixtures are organized in the `testdata/` directory:
 
 Contains paired test files for template rendering validation:
 
-- **`.vuego`** - Template files with directives (v-if, v-for, v-bind, etc.)
-- **`.json`** - Input data for the template
-- **`.html`** - Expected output after rendering
+- `.vuego` - Template files with directives (v-if, v-for, v-bind, etc.)
+- `.json` - Input data for the template
+- `.html` - Expected output after rendering
 
 Each test case consists of three files with the same base name:
 

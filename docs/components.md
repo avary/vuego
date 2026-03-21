@@ -89,9 +89,9 @@ Component shorthands use custom HTML tags that match your component names (conve
 
 1. Component files are scanned using glob patterns (e.g., `components/*.vuego`)
 2. The filename (without extension) is converted from PascalCase to kebab-case:
-   - `ButtonPrimary.vuego` → `<button-primary>`
-   - `AlertBox.vuego` → `<alert-box>`
-   - `MyComponent.vuego` → `<my-component>`
+   - `ButtonPrimary.vuego` becomes `<button-primary>`
+   - `AlertBox.vuego` becomes `<alert-box>`
+   - `MyComponent.vuego` becomes `<my-component>`
 3. When a shorthand tag is encountered, it's replaced with a `<template include>` directive
 4. Attributes on the tag are passed as context variables to the component
 

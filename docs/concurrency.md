@@ -39,7 +39,7 @@ type VueContext struct {
 }
 ```
 
-**Each render gets its own isolated stack** → No shared mutable state → No race conditions!
+**Each render gets its own isolated stack**: No shared mutable state, no race conditions.
 
 ## Usage Examples
 

@@ -1,6 +1,6 @@
 # Data Loading
 
-Vuego automatically loads YAML configuration files from the template filesystem when you create a renderer with `NewFS` or `New(WithFS(...))`. This provides global data — such as site metadata, navigation menus, and theme settings — to every template without requiring explicit `Fill()` or `Assign()` calls.
+Vuego automatically loads YAML configuration files from the template filesystem when you create a renderer with `NewFS` or `New(WithFS(...))`. This provides global data (site metadata, navigation menus, and theme settings) to every template without requiring explicit `Fill()` or `Assign()` calls.
 
 ## Table of Contents
 
@@ -29,7 +29,7 @@ When `NewFS()` is called, Vuego automatically:
 The loaded data is merged into the template's initial context, making it available to all templates as top-level variables.
 
 ```go
-// Config loading is implicit — no extra options needed
+// Config loading is implicit, no extra options needed
 renderer := vuego.NewFS(os.DirFS("templates"))
 ```
 
@@ -280,7 +280,7 @@ my-site/
 ```go
 renderer := vuego.NewFS(os.DirFS("my-site"), vuego.WithComponents())
 
-// All config is auto-loaded — just render
+// All config is auto-loaded, just render
 err := renderer.Load("pages/index.vuego").Render(ctx, w)
 ```
 
@@ -313,7 +313,7 @@ var renderer = vuego.NewFS(embedFS, vuego.WithComponents())
 
 ## See Also
 
-- [Theme Structuring Guide](themes.md) — Layout organization and directory conventions
-- [Components Guide](components.md) — Component composition and props
-- [Template Syntax](syntax.md) — Variable interpolation and directives
-- [API Reference](api.md) — Go API documentation
+- [Theme Structuring Guide](themes.md) - Layout organization and directory conventions
+- [Components Guide](components.md) - Component composition and props
+- [Template Syntax](syntax.md) - Variable interpolation and directives
+- [API Reference](api.md) - Go API documentation

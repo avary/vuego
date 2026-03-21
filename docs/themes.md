@@ -87,14 +87,18 @@ Vuego uses a layout chaining system where templates can specify a parent layout 
 
 **Common Layout Hierarchy:**
 
-```
-base.vuego          ← Root HTML document structure
-    ↓
-default.vuego       ← Default page wrapper with header/footer
-    ↓
-page.vuego          ← Static page with sidebar
-post.vuego          ← Blog post with metadata
-docs.vuego          ← Documentation with TOC
+```mermaid
+graph TD
+    base["base.vuego<br/>(root HTML document)"]
+    default["default.vuego<br/>(page wrapper with header/footer)"]
+    page["page.vuego<br/>(static page with sidebar)"]
+    post["post.vuego<br/>(blog post with metadata)"]
+    docs["docs.vuego<br/>(documentation with TOC)"]
+
+    base --> default
+    default --> page
+    default --> post
+    default --> docs
 ```
 
 ### Layout Chaining
@@ -520,12 +524,13 @@ breadcrumbs:
 
 Build layouts hierarchically rather than duplicating code:
 
-```
-base.vuego           # HTML document structure (shared by all)
-    ↓
-default.vuego        # Common header/footer
-    ↓
-page.vuego           # Page-specific structure
+```mermaid
+graph TD
+    base["base.vuego<br/>(HTML document structure)"]
+    default["default.vuego<br/>(common header/footer)"]
+    page["page.vuego<br/>(page-specific structure)"]
+
+    base --> default --> page
 ```
 
 ### 2. Keep Partials Focused
